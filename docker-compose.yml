@@ -3,7 +3,7 @@ version: '3.8'
 services:
   web:
     image: nginx:${NGINX_VERSION}
-#    container_name: nginx
+    #    container_name: nginx
     ports:
       - "80:80"
     restart: always
@@ -19,6 +19,8 @@ services:
     depends_on:
       - php
       - db
+      - redis
+      - memcached
   php:
     #    image: php:7.4-fpm
     image: nanoninja/php-fpm:${PHP_VERSION}
@@ -33,7 +35,7 @@ services:
     command: install
   db:
     image: mariadb:${MARIADB_VERSION}
-#    container_name: ${MARIADB_HOST}
+    #    container_name: ${MARIADB_HOST}
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD : ${MARIADB_ROOT_PASSWORD}
@@ -45,9 +47,10 @@ services:
     volumes:
       - ./mariadb/db/mysql:/var/lib/mysql
       - ../sql:/docker-entrypoint-initdb.d
+      - ./mariadb/conf:/etc/mysql/conf.d
   myadmin:
     image: phpmyadmin:${PHPMYADMIN_VERSION}
-#    container_name: phpmyadmin
+    #    container_name: phpmyadmin
     ports:
       - "8080:80"
     environment:
@@ -60,3 +63,13 @@ services:
       - db
     links:
       - db
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    restart: always
+  memcached:
+    image: memcached
+    ports:
+      - "11211:11211"
+    restart: always
