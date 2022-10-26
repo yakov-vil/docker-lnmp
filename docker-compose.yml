@@ -9,7 +9,7 @@ services:
     restart: always
     volumes:
       #conf files
-      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/conf:/etc/nginx/conf.d:ro
       #log files
       - ./nginx/log:/var/log/nginx
       #       Mount source-code for development
@@ -26,7 +26,7 @@ services:
     image: nanoninja/php-fpm:${PHP_VERSION}
     restart: always
     volumes:
-      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./php/conf/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
       - ../:/app
   composer:
     image: composer
