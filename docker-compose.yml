@@ -29,9 +29,8 @@ services:
     volumes:
       - ./php/conf/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
       - ../:/app
-#    command: [ "bash", "-c", "while true; do php /app/yii queue/run; done"]
   composer:
-    image: composer
+    image: composer:${COMPOSER_VERSION}
     volumes:
       - ../:/app
     command: install
