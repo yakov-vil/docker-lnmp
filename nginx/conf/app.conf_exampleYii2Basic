@@ -1,4 +1,7 @@
 server {
+    charset utf-8;
+    client_max_body_size 128M;
+
     listen 80;
     server_name localhost;
 
@@ -8,32 +11,30 @@ server {
     error_log /var/log/nginx/app.local_error.log warn;
     access_log /var/log/nginx/app.local_access.log;
 
-    charset UTF-8;
     index index.php index.html;
 
     location / {
-        try_files $uri $uri/ /web/index.php$is_args$args;
+        # Redirect everything that isn't a real file to index.php
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
 
-        # omit static files logging, and if they don't exist, avoid processing by Yii (uncomment if necessary)
-#        location ~ ^/.+\.(css|js|ico|png|jpe?g|gif|svg|ttf|mp4|mov|swf|pdf|zip|rar)$ {
-#            log_not_found off;
-#            access_log off;
-#            try_files $uri =404;
-#        }
+    # uncomment to avoid processing of calls to non-existing static files by Yii
+    #location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+    #    try_files $uri =404;
+    #}
+    #error_page 404 /404.html;
 
-        location ~ ^/assets/.+\.php(/|$) {
-            deny all;
-        }
+    # deny accessing php files for the /assets directory
+    location ~ ^/assets/.*\.php$ {
+        deny all;
     }
 
     location ~ ^/.+\.php(/|$) {
-        try_files $uri =404;
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass php:9000;
-        fastcgi_index index.php;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_pass php:9000;
+        #fastcgi_pass unix:/var/run/php5-fpm.sock;
+        try_files $uri =404;
     }
 
     location ~ /\. {
